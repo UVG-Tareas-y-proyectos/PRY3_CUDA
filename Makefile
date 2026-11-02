@@ -1,5 +1,5 @@
 NVCC ?= nvcc
-NVCCFLAGS ?= -O2 -std=c++17 -Xcompiler=-Wall,-Wextra
+NVCCFLAGS ?= -O2 -std=c++17 --fmad=false -Xcompiler=-Wall,-Wextra,-ffp-contract=off
 
 TARGET := build/hough
 SOURCES := src/hough.cu common/pgm.cpp

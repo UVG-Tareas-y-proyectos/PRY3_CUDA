@@ -106,6 +106,36 @@ __global__ void houghConstantKernel(const unsigned char *image, int width, int h
   }
 }
 
+// Un acumulador de 9000 enteros (36000 bytes) pertenece a cada bloque.
+// Incluso los hilos del ultimo bloque que exceden la imagen deben alcanzar
+// AMBAS barreras. Salir anticipadamente aqui produciria una sincronizacion invalida.
+__global__ void houghSharedKernel(const unsigned char *image, int width, int height,
+                                  int *accumulator, float rMax, float rScale) {
+  __shared__ int localAcc[kDegreeBins * kRBins];
+  const int locID = threadIdx.x;
+  const int globalId = blockIdx.x * blockDim.x + locID;
+  for (int i = locID; i < kDegreeBins * kRBins; i += blockDim.x)
+    localAcc[i] = 0;
+  __syncthreads();  // Nadie vota antes de terminar la inicializacion cooperativa.
+
+  if (globalId < width * height && image[globalId] != 0) {
+    const int xCoord = globalId % width - width / 2;
+    const int yCoord = height / 2 - globalId / width;
+    for (int t = 0; t < kDegreeBins; ++t) {
+      const float radius = xCoord * constantCos[t] + yCoord * constantSin[t];
+      int rIndex = static_cast<int>((radius + rMax) / rScale);
+      rIndex = max(0, min(kRBins - 1, rIndex));
+      // Diferentes pixeles pueden votar por la misma recta, aun dentro del bloque.
+      atomicAdd(&localAcc[rIndex * kDegreeBins + t], 1);
+    }
+  }
+  __syncthreads();  // La fusion solo lee votos completamente actualizados.
+  for (int i = locID; i < kDegreeBins * kRBins; i += blockDim.x) {
+    const int votes = localAcc[i];
+    if (votes != 0) atomicAdd(&accumulator[i], votes);
+  }
+}
+
 template <typename LaunchKernel>
 TimedResult measureKernel(LaunchKernel launch, int *deviceAccumulator,
                           std::size_t accumulatorBytes) {
@@ -192,7 +222,7 @@ TimedResult houghGpuGlobal(
 TimedResult houghGpuConstant(const PGMImage &image,
                              const std::array<float, kDegreeBins> &cosTable,
                              const std::array<float, kDegreeBins> &sinTable,
-                             float rMax, float rScale) {
+                             float rMax, float rScale, bool useShared = false) {
   const std::size_t pixelBytes = image.pixels.size() * sizeof(unsigned char);
   const std::size_t accumulatorBytes = kDegreeBins * kRBins * sizeof(int);
   unsigned char *deviceImage = nullptr;
@@ -213,7 +243,10 @@ TimedResult houghGpuConstant(const PGMImage &image,
   const int blocks = (pixelCount + kThreadsPerBlock - 1) / kThreadsPerBlock;
   const TimedResult result = measureKernel(
       [&]() {
-        houghConstantKernel<<<blocks, kThreadsPerBlock>>>(
+        if (useShared)
+          houghSharedKernel<<<blocks, kThreadsPerBlock>>>(
+              deviceImage, image.width, image.height, deviceAccumulator, rMax, rScale);
+        else houghConstantKernel<<<blocks, kThreadsPerBlock>>>(
             deviceImage, image.width, image.height, deviceAccumulator, rMax,
             rScale);
       },
@@ -264,6 +297,7 @@ int main(int argc, char **argv) {
     const std::vector<int> cpu = houghCpu(image, cosTable, sinTable, rMax, rScale);
     TimedResult global = houghGpuGlobal(image, cosTable, sinTable, rMax, rScale);
     TimedResult constant = houghGpuConstant(image, cosTable, sinTable, rMax, rScale);
+    TimedResult shared = houghGpuConstant(image, cosTable, sinTable, rMax, rScale, true);
 
     int device = 0;
     cudaDeviceProp properties{};
@@ -282,11 +316,16 @@ int main(int argc, char **argv) {
               << "Tiempos constante (ms):";
     for (float milliseconds : constant.measurementsMilliseconds)
       std::cout << ' ' << milliseconds;
+    std::cout << "\nPromedio kernel compartido: " << shared.averageMilliseconds
+              << " ms\nTiempos compartido (ms):";
+    for (float milliseconds : shared.measurementsMilliseconds)
+      std::cout << ' ' << milliseconds;
     std::cout << '\n';
     const bool globalMatches = reportComparison("global", cpu, global.accumulator);
     const bool constantMatches = reportComparison("constante", cpu, constant.accumulator);
+    const bool sharedMatches = reportComparison("compartida", cpu, shared.accumulator);
     checkCuda(cudaDeviceReset(), "cudaDeviceReset");
-    return globalMatches && constantMatches ? 0 : 1;
+    return globalMatches && constantMatches && sharedMatches ? 0 : 1;
   } catch (const std::exception &error) {
     std::cerr << "Error: " << error.what() << '\n';
     return 1;
