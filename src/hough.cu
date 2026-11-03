@@ -1,4 +1,5 @@
 #include "common/pgm.h"
+#include "common/output.h"
 
 #include <algorithm>
 #include <array>
@@ -324,6 +325,13 @@ int main(int argc, char **argv) {
     const bool globalMatches = reportComparison("global", cpu, global.accumulator);
     const bool constantMatches = reportComparison("constante", cpu, constant.accumulator);
     const bool sharedMatches = reportComparison("compartida", cpu, shared.accumulator);
+    if (globalMatches && constantMatches && sharedMatches) {
+      const int threshold = static_cast<int>(*std::max_element(cpu.begin(), cpu.end()) * 0.55);
+      const auto lines = selectLines(shared.accumulator, kDegreeBins, kRBins, threshold, 12);
+      writeOverlay("runway_lines.png", image, lines, kDegreeIncrement, rMax, rScale);
+      writeLines("runway_lines.csv", lines, kDegreeIncrement, rMax, rScale);
+      std::cout << "Lineas detectadas: " << lines.size() << ", umbral estricto > " << threshold << '\n';
+    }
     checkCuda(cudaDeviceReset(), "cudaDeviceReset");
     return globalMatches && constantMatches && sharedMatches ? 0 : 1;
   } catch (const std::exception &error) {

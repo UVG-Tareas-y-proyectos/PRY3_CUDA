@@ -2,13 +2,13 @@ NVCC ?= nvcc
 NVCCFLAGS ?= -O2 -std=c++17 --fmad=false -Xcompiler=-Wall,-Wextra,-ffp-contract=off
 
 TARGET := build/hough
-SOURCES := src/hough.cu common/pgm.cpp
+SOURCES := src/hough.cu common/pgm.cpp common/output.cpp
 
 .PHONY: all clean run
 
 all: $(TARGET)
 
-$(TARGET): $(SOURCES) common/pgm.h
+$(TARGET): $(SOURCES) common/pgm.h common/output.h
 	mkdir -p build
 	$(NVCC) $(NVCCFLAGS) -I. $(SOURCES) -o $@
 
