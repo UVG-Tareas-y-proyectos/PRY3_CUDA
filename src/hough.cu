@@ -1,3 +1,5 @@
+// Basado en houghBase.cu de G. Barlas (2014), distribuido bajo GNU GPL v3.
+// Ver NOTICE.md y LICENSE para la atribucion y licencia del codigo base.
 #include "common/pgm.h"
 #include "common/output.h"
 

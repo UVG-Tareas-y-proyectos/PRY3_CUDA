@@ -3,3 +3,6 @@ build/
 *.out
 *.csv
 *.log
+!results/*.csv
+.toolchain/
+__pycache__/
