@@ -52,6 +52,9 @@ PGMImage::PGMImage(const std::string &path) {
   const std::size_t count = static_cast<std::size_t>(width) * height;
   if (count / static_cast<std::size_t>(width) != static_cast<std::size_t>(height))
     throw std::runtime_error("Dimensiones PGM demasiado grandes");
+  // Los kernels usan IDs enteros de 32 bits, incluido el relleno del ultimo bloque.
+  if (count > static_cast<std::size_t>(std::numeric_limits<int>::max() - 255))
+    throw std::runtime_error("La imagen excede el rango de indices CUDA de 32 bits");
   pixels.resize(count);
 
   if (magic == "P5") {
@@ -63,6 +66,8 @@ PGMImage::PGMImage(const std::string &path) {
                static_cast<std::streamsize>(pixels.size()));
     if (input.gcount() != static_cast<std::streamsize>(pixels.size()))
       throw std::runtime_error("Datos PGM incompletos");
+    for (unsigned char pixel : pixels)
+      if (pixel > maxValue) throw std::runtime_error("Pixel PGM fuera del rango declarado");
     if (maxValue != 255) {
       for (unsigned char &pixel : pixels)
         pixel = static_cast<unsigned char>((static_cast<int>(pixel) * 255) / maxValue);

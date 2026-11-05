@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <numeric>
 #include <sstream>
 #include <iomanip>
 #include <iostream>
@@ -353,6 +354,9 @@ int execute(const Options &options) {
   const float rScale = 2.0f * rMax / kRBins;
   const auto begin = std::chrono::steady_clock::now();
   const auto cpu = houghCpu(image, cosTable, sinTable, rMax, rScale);
+  const auto active = std::count_if(image.pixels.begin(), image.pixels.end(), [](auto value) { return value != 0; });
+  if (std::accumulate(cpu.begin(), cpu.end(), 0LL) != active * static_cast<long long>(kDegreeBins))
+    throw std::runtime_error("Fallo de conservacion de votos CPU");
   const double cpuMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - begin).count();
   const std::array<Variant, 3> variants{Variant::Global, Variant::Constant, Variant::Shared};
   std::array<TimedResult, 3> results;
