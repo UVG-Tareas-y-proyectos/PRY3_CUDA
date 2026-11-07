@@ -1,0 +1,2 @@
+mkdir -p build
+nvcc -ccbin g++-14 -O2 -std=c++17 --fmad=false -Xcompiler=-Wall,-Wextra,-ffp-contract=off -L/mnt/c/Users/VICTUS/Documents/Codex/2026-11-06/te/work/cuda13/lib -Xcompiler=--sysroot=/mnt/c/Users/VICTUS/Documents/Codex/2026-11-06/te/work/sysroot -arch=sm_86 -I. src/hough.cu common/pgm.cpp common/output.cpp -o build/hough

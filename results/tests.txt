@@ -1,0 +1,20 @@
+python3 tests/test_integration.py --binary ./build/hough
+PASS negra
+PASS un_pixel
+PASS bloque_257
+PASS densa_impar
+PASS aleatoria
+PASS vertical
+PASS horizontal
+PASS diagonal
+PASS byte_espacio
+PASS rechazo vacia
+PASS rechazo formato
+PASS rechazo cero
+PASS rechazo negativa
+PASS rechazo truncada
+PASS rechazo max16
+PASS rechazo rango_p2
+PASS rechazo rango_p5
+PASS rechazo overflow
+23 pruebas aprobadas.

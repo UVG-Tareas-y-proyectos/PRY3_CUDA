@@ -1,0 +1,36 @@
+GPU: NVIDIA GeForce RTX 3060 Laptop GPU
+Imagen: 800x600
+CPU: 26.825217 ms
+Kernel global: media=1.148245 ms; 30 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Kernel constante: media=1.328060 ms; 30 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Kernel compartida: media=0.726596 ms; 30 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Lineas: 12; umbral de votos > 2772
+Salidas: results/runway_{lines.png,lines.csv,timings.csv,metadata.json}
+{
+  "global_ms": {
+    "n": 30,
+    "mean": 1.1482453333333333,
+    "median": 1.119232,
+    "stdev": 0.13571003267701104,
+    "minimum": 1.000448,
+    "maximum": 1.4336
+  },
+  "constant_ms": {
+    "n": 30,
+    "mean": 1.3280597333333333,
+    "median": 1.312768,
+    "stdev": 0.038623741491768865,
+    "minimum": 1.288192,
+    "maximum": 1.410048
+  },
+  "shared_ms": {
+    "n": 30,
+    "mean": 0.7265962666666667,
+    "median": 0.726016,
+    "stdev": 0.030938948183237544,
+    "minimum": 0.687104,
+    "maximum": 0.781312
+  },
+  "global_over_constant": 0.8646036804770227,
+  "global_over_shared": 1.5803072297646452
+}

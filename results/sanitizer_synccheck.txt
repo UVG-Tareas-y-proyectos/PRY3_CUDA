@@ -1,0 +1,14 @@
+========= COMPUTE-SANITIZER
+========= Error: Failed to initialize WDDM debugger interface. Please run EnableDebuggerInterface.bat as an administrator
+========= 
+========= Error: Device not supported. Please refer to the "Supported Devices" section of the sanitizer documentation
+========= 
+GPU: NVIDIA GeForce RTX 3060 Laptop GPU
+Imagen: 35x35
+CPU: 0.066620 ms
+Kernel global: media=0.020480 ms; 1 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Kernel constante: media=0.058368 ms; 1 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Kernel compartida: media=0.126976 ms; 1 repeticiones; CPU/GPU: 9000/9000 bins coinciden en cada repeticion.
+Lineas: 1; umbral de votos > 9
+Salidas: /mnt/c/Users/VICTUS/Documents/Codex/2026-11-06/te/work/sanitized_{lines.png,lines.csv,timings.csv,metadata.json}
+========= ERROR SUMMARY: 2 errors
