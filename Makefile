@@ -20,10 +20,10 @@ $(TARGET): $(SOURCES) common/pgm.h common/output.h
 	$(NVCC) -ccbin $(HOST_CXX) $(NVCCFLAGS) $(EXTRA_NVCCFLAGS) -arch=sm_$(CUDA_ARCH) -I. $(SOURCES) -o $@
 
 run: $(TARGET)
-	./$(TARGET) $(INPUT) --output $(OUTPUT)
+	./$(TARGET) "$(INPUT)" --output "$(OUTPUT)"
 
 benchmark: $(TARGET)
-	$(PYTHON) scripts/benchmark.py --binary ./$(TARGET) --image $(INPUT) --output $(OUTPUT) --runs $(RUNS)
+	$(PYTHON) scripts/benchmark.py --binary ./$(TARGET) --image "$(INPUT)" --output "$(OUTPUT)" --runs $(RUNS)
 
 test: $(TARGET)
 	$(PYTHON) tests/test_integration.py --binary ./$(TARGET)
