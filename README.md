@@ -13,6 +13,7 @@ constante + compartida. Cada ejecución medida exige coincidencia exacta de sus
 - [Informe PDF](docs/informe.pdf), 13 páginas, con formato de los documentos de
   referencia, algoritmo, diagramas, bitácora, análisis, bibliografía y relación
   con las presentaciones de la clase.
+- [Presentación para Canva](docs/PRY3_CUDA_presentacion_Canva.pptx), diez diapositivas en formato PowerPoint.
 - [Imagen con líneas](results/runway_lines.png) y [parámetros](results/runway_lines.csv).
 - [90 mediciones individuales](results/runway_timings.csv),
   [estadísticos](results/runway_summary.json) y [entorno](results/runway_metadata.json).
@@ -145,8 +146,7 @@ results/                   Mediciones, PNG, parámetros y logs
 docs/informe.pdf           Informe final
 ```
 
-El informe se entrega únicamente en PDF. El equipo elaborará su presentación
-por separado.
+El informe se entrega en PDF y la presentación en PowerPoint está en `docs/`.
 
 Para publicar la revisión local, autenticar Git con escritura en el repositorio
 y ejecutar `git push origin main`. Los commits anteriores se conservan.

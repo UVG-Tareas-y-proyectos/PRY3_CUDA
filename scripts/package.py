@@ -22,10 +22,10 @@ subprocess.run(['git', 'bundle', 'create', str(bundle), 'main', 'HEAD'], cwd=roo
 subprocess.run(['git', 'bundle', 'verify', str(bundle)], cwd=root, check=True)
 with zipfile.ZipFile(archive) as zipped:
     assert zipped.testzip() is None
-    for expected in ['src/hough.cu', 'docs/informe.pdf', 'results/runway_timings.csv', 'data/runway.pgm']:
+    for expected in ['src/hough.cu', 'docs/informe.pdf', 'docs/PRY3_CUDA_presentacion_Canva.pptx', 'results/runway_timings.csv', 'data/runway.pgm']:
         assert 'PRY3_CUDA/' + expected in zipped.namelist(), expected
     documents = [name for name in zipped.namelist() if name.startswith('PRY3_CUDA/docs/') and not name.endswith('/')]
-    assert documents == ['PRY3_CUDA/docs/informe.pdf'], documents
+    assert set(documents) == {'PRY3_CUDA/docs/informe.pdf', 'PRY3_CUDA/docs/PRY3_CUDA_presentacion_Canva.pptx'}, documents
 manifest = destination / 'SHA256SUMS.txt'
 manifest.write_text(''.join(hashlib.sha256(file.read_bytes()).hexdigest() + '  ' + file.name + '\n' for file in [archive, bundle]), encoding='utf-8')
 print(archive)
